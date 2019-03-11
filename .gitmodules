@@ -1,0 +1,6 @@
+[submodule "termbox-go"]
+	path = termbox-go
+	url = https://github.com/nsf/termbox-go
+[submodule "terminfo"]
+	path = terminfo
+	url = https://github.com/xo/terminfo
