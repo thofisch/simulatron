@@ -4,3 +4,9 @@
 [submodule "terminfo"]
 	path = terminfo
 	url = https://github.com/xo/terminfo
+[submodule "win"]
+	path = win
+	url = https://github.com/kbinani/win.git
+[submodule "tcell"]
+	path = tcell
+	url = https://github.com/gdamore/tcell
