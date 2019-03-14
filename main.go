@@ -1,3 +1,5 @@
+// +build !windows
+
 package main
 
 import (
@@ -15,37 +17,27 @@ import (
 	"sync"
 	"syscall"
 	"time"
-	"unsafe"
 )
 
 var started = time.Now()
 
 func main() {
 
-	fmt.Println(getTermSize())
+	//run()
 
-	run()
-
-}
-
-var terminalSize = getTermSize()
-
-type termSize struct {
-	rows int
-	cols int
-}
-
-func getTermSize() termSize {
-	type winsize struct {
-		rows    uint16
-		cols    uint16
-		xpixels uint16
-		ypixels uint16
+	out, err := syscall.Open("CONOUT$", syscall.O_RDWR, 0)
+	if err != nil {
+		panic(err)
 	}
+	defer syscall.Close
 
-	var sz winsize
-	_, _, _ = syscall.Syscall(syscall.SYS_IOCTL, os.Stdout.Fd(), uintptr(syscall.TIOCGWINSZ), uintptr(unsafe.Pointer(&sz)))
-	return termSize{cols: int(sz.cols), rows: int(sz.rows)}
+	// c, tr := get_term_size(out)
+
+	// fmt.Println(c)
+	// fmt.Println(tr)
+
+	fmt.Fprintf(out, "lala")
+
 }
 
 func reversePositions(positions []position) []position {
@@ -71,11 +63,11 @@ func routeConsumer(id int, ch <-chan vehicleRoute, done <-chan bool) {
 		PrintConsumer(id, count, "Waiting for channels...")
 		select {
 		case vr := <-ch:
-			PrintConsumer(id, count,"Processing route %d: %s\n", count, vr.route.name)
+			PrintConsumer(id, count, "Processing route %d: %s\n", count, vr.route.name)
 			select {
 			case <-time.After(time.Duration(seededRand.Intn(1000)) * time.Millisecond):
 			case <-done:
-				PrintConsumer(id, count,"Quitting...")
+				PrintConsumer(id, count, "Quitting...")
 				return
 			}
 		case <-done:
@@ -89,13 +81,13 @@ func routeConsumer(id int, ch <-chan vehicleRoute, done <-chan bool) {
 func routeProducer(id int, ch chan<- vehicleRoute, done <-chan bool) {
 	defer wg.Done()
 
-	count:=1
+	count := 1
 
 	for {
 		select {
 		case ch <- generateVehicleRoute(id, count):
 		case <-done:
-			PrintProducer(id, count,"Quitting...")
+			PrintProducer(id, count, "Quitting...")
 			return
 		}
 		count++
@@ -104,7 +96,7 @@ func routeProducer(id int, ch chan<- vehicleRoute, done <-chan bool) {
 
 func generateVehicleRoute(id int, count int) vehicleRoute {
 	vr := vehicleRoute{route: getRoute(), vehicleId: generateId("urn:external:vehicle")}
-	PrintProducer(id, count ,"Route %s for vehicle %s send...\n", vr.route.name, vr.vehicleId)
+	PrintProducer(id, count, "Route %s for vehicle %s send...\n", vr.route.name, vr.vehicleId)
 	return vr
 }
 
@@ -149,7 +141,7 @@ func printTOD() {
 }
 
 func PrintStatusBar(format string, a ...interface{}) {
-	PrintAt(1, statusOffset, strings.Repeat("\033[30;42m \033[0m", terminalSize.cols))
+	PrintAt(1, statusOffset, strings.Repeat("\033[30;42m \033[0m", 200 /*terminalSize.cols*/))
 	status <- fmt.Sprintf(format, a...)
 }
 
@@ -223,7 +215,7 @@ func run() {
 
 	PrintAt(1, producerOffset+1+producers+2, "Done")
 
-//	fmt.Println("Done")
+	//	fmt.Println("Done")
 
 	//awayRoute := getRandomRoute()
 	//homeRoute := getRandomRoute()

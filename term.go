@@ -1,3 +1,5 @@
+// +build !windows
+
 package main
 
 import (
@@ -101,7 +103,7 @@ func NewTerm() (Term, error) {
 	//back_buffer.clear()
 	//front_buffer.clear()
 
-	printClose:= func() {
+	printClose := func() {
 		fmt.Printf("\033[1;%dH[X]", termw-(3-1))
 	}
 	printClose()
@@ -174,9 +176,9 @@ var (
 	background = ColorDefault
 	//inbuf          = make([]byte, 0, 64)
 	//outbuf         bytes.Buffer
-	sigwinch       = make(chan os.Signal, 1)
+	sigwinch = make(chan os.Signal, 1)
 	//sigio          = make(chan os.Signal, 1)
-	quit           = make(chan int)
+	quit = make(chan int)
 	//input_comm     = make(chan input_event)
 	//interrupt_comm = make(chan struct{})
 	//intbuf         = make([]byte, 0, 16)
